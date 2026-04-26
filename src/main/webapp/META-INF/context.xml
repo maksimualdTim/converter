@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <Resource
+        name="jdbc/converterDB"
+        auth="Container"
+        type="javax.sql.DataSource"
+        factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+        driverClassName="com.mysql.cj.jdbc.Driver"
+        url="jdbc:mysql://localhost:3306/converter"
+        username="foreverlife"
+        password="password"
+        maxTotal="20"
+        maxIdle="10"
+        minIdle="2"
+        initialSize="2"
+        testOnBorrow="true"
+        validationQuery="SELECT 1" />
+</Context>
