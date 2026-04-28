@@ -9,7 +9,7 @@ CREATE TABLE ExchangeRates (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     BaseCurrencyId INT NOT NULL,
     TargetCurrencyId INT NOT NULL,
-    Rate DECIMAL(6) NOT NULL,
+    Rate DECIMAL(20,6) NOT NULL,
 
     CONSTRAINT fk_exchange_rates_base_currency
         FOREIGN KEY (BaseCurrencyId) REFERENCES Currencies(ID),
