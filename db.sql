@@ -27,6 +27,12 @@ CREATE TABLE ExchangeRates (
         CHECK (Rate > 0)
 );
 
+ALTER TABLE Currencies
+ADD CONSTRAINT uq_currencies_code UNIQUE (Code);
+
+ALTER TABLE Currencies
+ADD CONSTRAINT uq_currencies_sign UNIQUE (Sign);
+
 INSERT INTO Currencies (Code, FullName, Sign) VALUES
 ('USD', 'US Dollar', '$'),
 ('EUR', 'Euro', '€'),
