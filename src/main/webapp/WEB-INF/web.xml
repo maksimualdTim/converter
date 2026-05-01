@@ -19,9 +19,20 @@
 		<servlet-name>ExchangeRatesServlet</servlet-name>
 		<servlet-class>servlets.ExchangeRatesServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>ExchangeRateServlet</display-name>
+		<servlet-name>ExchangeRateServlet</servlet-name>
+		<servlet-class>servlets.ExchangeRateServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>ExchangeRatesServlet</servlet-name>
 		<url-pattern>/ExchangeRatesServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ExchangeRateServlet</servlet-name>
+		<url-pattern>/ExchangeRateServlet</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>

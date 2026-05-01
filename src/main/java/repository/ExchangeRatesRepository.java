@@ -1,6 +1,7 @@
 package repository;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -45,28 +46,69 @@ JOIN Currencies target
 				Statement statement = connection.createStatement();
 				ResultSet res = statement.executeQuery(sql)) {
 				while (res.next()) {
-					Currency targetCurrency = new Currency();
-					Currency baseCurrency = new Currency();
-					ExchangeRate exchangeRate = new ExchangeRate();
-					
-					baseCurrency.setCode(res.getString("BaseCurrencyCode"));
-					baseCurrency.setSign(res.getString("BaseCurrencySign"));
-					baseCurrency.setFullName(res.getString("BaseCurrencyFullName"));
-					baseCurrency.setId(res.getInt("BaseCurrencyId"));
-					
-					targetCurrency.setCode(res.getString("TargetCurrencyCode"));
-					targetCurrency.setSign(res.getString("TargetCurrencySign"));
-					targetCurrency.setFullName(res.getString("TargetCurrencyFullName"));
-					targetCurrency.setId(res.getInt("TargetCurrencyId"));
-					
-					exchangeRate.setId(res.getInt("ExchangeRateId"));
-					exchangeRate.setRate(res.getBigDecimal("Rate"));
-					exchangeRate.setBaseCurrency(baseCurrency);
-					exchangeRate.setTargetCurrency(targetCurrency);
-					result.add(exchangeRate);
+					result.add(mapExchangeRate(res));
 				}
 		}
 		
 		return result;
+	}
+	
+	public ExchangeRate findByCodes(String codeBase, String codeTarget) throws SQLException {		
+		String sql = """
+				SELECT 
+e.ID AS ExchangeRateId,
+base.ID AS BaseCurrencyId,
+base.Code AS BaseCurrencyCode,
+base.Sign AS BaseCurrencySign,
+base.FullName as BaseCurrencyFullName,
+target.ID AS TargetCurrencyId,
+target.Code AS TargetCurrencyCode,
+target.Sign AS TargetCurrencySign,
+target.FullName AS TargetCurrencyFullName,
+e.Rate
+FROM ExchangeRates e
+JOIN Currencies base 
+    ON base.ID = e.BaseCurrencyId
+JOIN Currencies target 
+    ON target.ID = e.TargetCurrencyId
+WHERE base.Code = ? AND target.Code = ?
+				""";
+		try(Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(sql);
+				) {
+				statement.setString(1, codeBase);
+				statement.setString(2, codeTarget);
+				try (ResultSet res = statement.executeQuery()) {
+					while (res.next()) {
+						return mapExchangeRate(res);
+					}	
+				}
+		}
+		return null;
+	}
+	
+	private ExchangeRate mapExchangeRate(ResultSet res) throws SQLException {
+		ExchangeRate exchangeRate = new ExchangeRate();
+		
+		Currency targetCurrency = mapCurrency(res, "Base");
+		Currency baseCurrency = mapCurrency(res, "Target");
+		
+		exchangeRate.setId(res.getInt("ExchangeRateId"));
+		exchangeRate.setRate(res.getBigDecimal("Rate"));
+		exchangeRate.setBaseCurrency(baseCurrency);
+		exchangeRate.setTargetCurrency(targetCurrency);
+		
+		return exchangeRate;
+	}
+	
+	private Currency mapCurrency(ResultSet res, String basis) throws SQLException {
+		Currency currency = new Currency();
+		
+		currency.setCode(res.getString(basis + "CurrencyCode"));
+		currency.setSign(res.getString(basis + "CurrencySign"));
+		currency.setFullName(res.getString(basis + "CurrencyFullName"));
+		currency.setId(res.getInt(basis + "CurrencyId"));
+		
+		return currency;
 	}
 }
