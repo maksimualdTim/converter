@@ -2,8 +2,9 @@ package services;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
-import exceptions.ExchangeRateNotFoundException;
+import exceptions.NotFoundException;
 import models.ExchangeRate;
 import repository.ExchangeRatesRepository;
 
@@ -18,9 +19,11 @@ public class ExchangeRatesService {
 		return exchangeRatesRepository.findAll();
 	}
 	
-	public ExchangeRate findByCodes(String codeBase, String codeTarget) throws SQLException, ExchangeRateNotFoundException {
+	public ExchangeRate findByCodes(String codeBase, String codeTarget) throws SQLException, NotFoundException {
+		Objects.requireNonNull(codeBase, "codeBase must not be null");
+		Objects.requireNonNull(codeTarget, "codeTarget must not be null");
 	    return exchangeRatesRepository.findByCodes(codeBase, codeTarget)
-	            .orElseThrow(() -> new ExchangeRateNotFoundException(
+	            .orElseThrow(() -> new NotFoundException(
 	                    "Exchange rate not found for " + codeBase + codeTarget
 	            ));
 	}

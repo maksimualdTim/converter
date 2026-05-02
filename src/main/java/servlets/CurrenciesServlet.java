@@ -48,8 +48,7 @@ public class CurrenciesServlet extends HttpServlet {
 			currencies = currencyService.findAll();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			response.getWriter().write("{\"message\":\"Internal server error\"}");
+			JsonErrorResponse.prepareResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal server error", response);
 			return;
 		}
 
@@ -69,17 +68,17 @@ public class CurrenciesServlet extends HttpServlet {
 	    String sign = trim(request.getParameter("sign"));
 		
 	    if (isBlank(name)) {
-	        writeError(response, HttpServletResponse.SC_BAD_REQUEST, "The name field is required");
+	        JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "The name field is required", response);
 	        return;
 	    }
 
 	    if (isBlank(code)) {
-	        writeError(response, HttpServletResponse.SC_BAD_REQUEST, "The code field is required");
+	        JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "The code field is required", response);
 	        return;
 	    }
 
 	    if (isBlank(sign)) {
-	        writeError(response, HttpServletResponse.SC_BAD_REQUEST, "The sign field is required");
+	        JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "The sign field is required", response);
 	        return;
 	    }
 		
@@ -99,8 +98,7 @@ public class CurrenciesServlet extends HttpServlet {
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			response.getWriter().write("{\"message\":\"Internal server error\"}");
+			JsonErrorResponse.prepareResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal server error", response);
 			return;
 		}
 		
@@ -114,11 +112,6 @@ public class CurrenciesServlet extends HttpServlet {
 
 	private boolean isBlank(String value) {
 	    return value == null || value.isBlank();
-	}
-
-	private void writeError(HttpServletResponse response, int status, String message) throws IOException {
-	    response.setStatus(status);
-	    response.getWriter().write("{\"message\":\"" + message + "\"}");
 	}
 
 }

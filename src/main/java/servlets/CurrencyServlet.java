@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import config.DataSourceProvider;
+import exceptions.NotFoundException;
 
 @WebServlet("/currency/*")
 public class CurrencyServlet extends HttpServlet {
@@ -37,41 +38,31 @@ public class CurrencyServlet extends HttpServlet {
         String pathInfo = request.getPathInfo();
 
         if (pathInfo == null || pathInfo.equals("/") || pathInfo.isBlank()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"message\":\"Code is required\"}");
+            JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "Code is required", response);
             return;
         }
 
         String[] params = pathInfo.substring(1).split("/");
         if (params.length != 1 || params[0].isBlank()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"message\":\"Invalid currency path\"}");
+            JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "Invalid currency path", response);
             return;
         }
 
         String code = params[0];
 
         if (!code.matches("[A-Za-z]{3}")) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"message\":\"Invalid currency code\"}");
+            JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "Invalid currency code", response);
             return;
         }
 
         try {
             Currency currency = currencyService.findByCode(code);
-
-            if (currency == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.getWriter().write("{\"message\":\"Currency not found\"}");
-                return;
-            }
-
-            response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(CurrencyJsonMapper.toJson(currency));
-        } catch (SQLException e) {
+        } catch (NotFoundException e) {
+        	JsonErrorResponse.prepareResponse(HttpServletResponse.SC_NOT_FOUND, "Currency not found", response);
+		} catch (SQLException e) {
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"message\":\"Internal server error\"}");
+            JsonErrorResponse.prepareResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal server error", response);
         }
     }
 

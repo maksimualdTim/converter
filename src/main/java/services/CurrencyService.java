@@ -2,8 +2,10 @@ package services;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 import exceptions.CurrencyAlreadyExistsException;
+import exceptions.NotFoundException;
 import models.Currency;
 import repository.CurrencyRepository;
 
@@ -18,11 +20,10 @@ public class CurrencyService {
         return currencyRepository.findAll();
     }
 
-    public Currency findByCode(String code) throws SQLException {
-        if (code == null || code.isBlank()) {
-            return null;
-        }
-        return currencyRepository.findByCode(code.toUpperCase());
+    public Currency findByCode(String code) throws SQLException, NotFoundException {
+    	Objects.requireNonNull(code);
+        return currencyRepository.findByCode(code.toUpperCase())
+        		.orElseThrow(() -> new NotFoundException("Currency not found"));
     }
     
     public Currency create(Currency currency) throws SQLException{

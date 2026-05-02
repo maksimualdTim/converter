@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import config.DataSourceProvider;
-import exceptions.ExchangeRateNotFoundException;
+import exceptions.NotFoundException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -48,35 +48,30 @@ public class ExchangeRateServlet extends HttpServlet {
 		String pathInfo = request.getPathInfo();
 		
         if (pathInfo == null || pathInfo.equals("/") || pathInfo.isBlank()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"message\":\"Code is required\"}");
+            JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "Code is required", response);
             return;
         }
         
         String[] params = pathInfo.substring(1).split("/");
         if (params.length != 1 || params[0].isBlank()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"message\":\"Invalid currency path\"}");
+            JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "Invalid currency path", response);
             return;
         }
         
         String codes = params[0].toUpperCase();
         if (!codes.matches("[A-Za-z]{6}")) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("{\"message\":\"Invalid currency codes\"}");
+            JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "Invalid currency codes", response);
             return;
         }
 		
         try {
 			ExchangeRate exchangeRate = exchangeRatesService.findByCodes(codes.substring(0, 3), codes.substring(3));
 			response.getWriter().write(ExchangeRatesJsonMapper.toJson(exchangeRate));
-		} catch (ExchangeRateNotFoundException e) {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			response.getWriter().write("{\"message\": \"" + e.getMessage() + "\"}");
+		} catch (NotFoundException e) {
+			JsonErrorResponse.prepareResponse(HttpServletResponse.SC_NOT_FOUND, e.getMessage(), response);
 		} catch (SQLException e) {
 			e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"message\":\"Internal server error\"}");
+			JsonErrorResponse.prepareResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal server error", response);
 		}
 	}
 

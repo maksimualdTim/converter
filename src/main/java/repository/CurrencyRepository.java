@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.sql.DataSource;
 
@@ -35,7 +36,7 @@ public class CurrencyRepository {
         return currencies;
     }
 
-    public Currency findByCode(String code) throws SQLException {
+    public Optional<Currency> findByCode(String code) throws SQLException {
         String sql = "SELECT ID, Code, FullName, Sign FROM Currencies WHERE Code = ?";
 
         try (Connection connection = dataSource.getConnection();
@@ -45,9 +46,9 @@ public class CurrencyRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
-                    return null;
+                    return Optional.empty();
                 }
-                return mapRow(resultSet);
+                return Optional.of(mapRow(resultSet));
             }
         }
     }

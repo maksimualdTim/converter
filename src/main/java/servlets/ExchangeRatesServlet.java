@@ -43,8 +43,7 @@ public class ExchangeRatesServlet extends HttpServlet {
 			response.getWriter().write(ExchangeRatesJsonMapper.toJson(exchangeRates));
 		} catch (SQLException e) {
 			e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"message\":\"Internal server error\"}");
+			JsonErrorResponse.prepareResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal server error", response);
 		}
 	}
 
