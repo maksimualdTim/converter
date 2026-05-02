@@ -19,12 +19,9 @@ public class ExchangeRatesService {
 	}
 	
 	public ExchangeRate findByCodes(String codeBase, String codeTarget) throws SQLException, ExchangeRateNotFoundException {
-		ExchangeRate exchangeRate = exchangeRatesRepository.findByCodes(codeBase, codeTarget);
-		
-		if (exchangeRate == null) {
-			throw new ExchangeRateNotFoundException("Exchange rate not found for " + codeBase + codeTarget);
-		}
-		
-		return exchangeRate;
+	    return exchangeRatesRepository.findByCodes(codeBase, codeTarget)
+	            .orElseThrow(() -> new ExchangeRateNotFoundException(
+	                    "Exchange rate not found for " + codeBase + codeTarget
+	            ));
 	}
 }

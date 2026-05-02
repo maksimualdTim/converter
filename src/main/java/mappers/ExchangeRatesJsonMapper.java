@@ -6,7 +6,7 @@ import java.util.List;
 import models.Currency;
 import models.ExchangeRate;
 
-public class ExchaneRatesJsonMapper {
+public class ExchangeRatesJsonMapper {
 	public static String toJson(ExchangeRate exchangeRate) {
 		StringBuilder result = new StringBuilder();
 		

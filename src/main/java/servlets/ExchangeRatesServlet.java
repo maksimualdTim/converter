@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import mappers.ExchaneRatesJsonMapper;
+import mappers.ExchangeRatesJsonMapper;
 import models.ExchangeRate;
 import repository.ExchangeRatesRepository;
 import services.ExchangeRatesService;
@@ -33,13 +33,6 @@ public class ExchangeRatesServlet extends HttpServlet {
         this.exchangeRatesService = new ExchangeRatesService(exchangeRatesRepository);
     }
 
-    /**
-     * Default constructor. 
-     */
-    public ExchangeRatesServlet() {
-        // TODO Auto-generated constructor stub
-    }
-
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -47,7 +40,7 @@ public class ExchangeRatesServlet extends HttpServlet {
 		List<ExchangeRate> exchangeRates;
 		try {
 			exchangeRates = exchangeRatesService.findAll();
-			response.getWriter().write(ExchaneRatesJsonMapper.toJson(exchangeRates));
+			response.getWriter().write(ExchangeRatesJsonMapper.toJson(exchangeRates));
 		} catch (SQLException e) {
 			e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

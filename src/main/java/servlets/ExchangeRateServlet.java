@@ -12,7 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import mappers.ExchaneRatesJsonMapper;
+import mappers.ExchangeRatesJsonMapper;
 import models.ExchangeRate;
 import repository.ExchangeRatesRepository;
 import services.ExchangeRatesService;
@@ -60,7 +60,7 @@ public class ExchangeRateServlet extends HttpServlet {
             return;
         }
         
-        String codes = params[0];
+        String codes = params[0].toUpperCase();
         if (!codes.matches("[A-Za-z]{6}")) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("{\"message\":\"Invalid currency codes\"}");
@@ -69,7 +69,7 @@ public class ExchangeRateServlet extends HttpServlet {
 		
         try {
 			ExchangeRate exchangeRate = exchangeRatesService.findByCodes(codes.substring(0, 3), codes.substring(3));
-			response.getWriter().write(ExchaneRatesJsonMapper.toJson(exchangeRate));
+			response.getWriter().write(ExchangeRatesJsonMapper.toJson(exchangeRate));
 		} catch (ExchangeRateNotFoundException e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			response.getWriter().write("{\"message\": \"" + e.getMessage() + "\"}");

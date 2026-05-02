@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.sql.DataSource;
 
@@ -53,19 +54,19 @@ JOIN Currencies target
 		return result;
 	}
 	
-	public ExchangeRate findByCodes(String codeBase, String codeTarget) throws SQLException {		
+	public Optional<ExchangeRate> findByCodes(String codeBase, String codeTarget) throws SQLException {		
 		String sql = """
-				SELECT 
-e.ID AS ExchangeRateId,
-base.ID AS BaseCurrencyId,
-base.Code AS BaseCurrencyCode,
-base.Sign AS BaseCurrencySign,
-base.FullName as BaseCurrencyFullName,
-target.ID AS TargetCurrencyId,
-target.Code AS TargetCurrencyCode,
-target.Sign AS TargetCurrencySign,
-target.FullName AS TargetCurrencyFullName,
-e.Rate
+SELECT 
+	e.ID AS ExchangeRateId,
+	base.ID AS BaseCurrencyId,
+	base.Code AS BaseCurrencyCode,
+	base.Sign AS BaseCurrencySign,
+	base.FullName as BaseCurrencyFullName,
+	target.ID AS TargetCurrencyId,
+	target.Code AS TargetCurrencyCode,
+	target.Sign AS TargetCurrencySign,
+	target.FullName AS TargetCurrencyFullName,
+	e.Rate
 FROM ExchangeRates e
 JOIN Currencies base 
     ON base.ID = e.BaseCurrencyId
@@ -79,19 +80,19 @@ WHERE base.Code = ? AND target.Code = ?
 				statement.setString(1, codeBase);
 				statement.setString(2, codeTarget);
 				try (ResultSet res = statement.executeQuery()) {
-					while (res.next()) {
-						return mapExchangeRate(res);
+					if (res.next()) {
+						return Optional.of(mapExchangeRate(res));
 					}	
 				}
 		}
-		return null;
+		return Optional.empty();
 	}
 	
 	private ExchangeRate mapExchangeRate(ResultSet res) throws SQLException {
 		ExchangeRate exchangeRate = new ExchangeRate();
 		
-		Currency targetCurrency = mapCurrency(res, "Base");
-		Currency baseCurrency = mapCurrency(res, "Target");
+		Currency baseCurrency = mapCurrency(res, "Base");
+		Currency targetCurrency = mapCurrency(res, "Target");
 		
 		exchangeRate.setId(res.getInt("ExchangeRateId"));
 		exchangeRate.setRate(res.getBigDecimal("Rate"));
