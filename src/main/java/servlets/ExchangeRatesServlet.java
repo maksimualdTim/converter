@@ -75,7 +75,7 @@ public class ExchangeRatesServlet extends HttpServlet {
 		}
 		
 		if (Utils.isBlank(rateString)) {
-	        JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "The rateString field is required", response);
+	        JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "The rate field is required", response);
 	        return;
 		}
 	    

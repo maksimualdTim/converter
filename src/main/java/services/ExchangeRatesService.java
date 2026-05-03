@@ -1,5 +1,6 @@
 package services;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +39,10 @@ public class ExchangeRatesService extends Service<ExchangeRate>{
             }
             throw e;
         }
+	}
+	
+	public ExchangeRate update(ExchangeRate exchangeRate, BigDecimal rate) throws SQLException {
+		return exchangeRatesRepository.update(exchangeRate, rate);
 	}
 	
 }

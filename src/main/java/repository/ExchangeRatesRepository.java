@@ -1,5 +1,6 @@
 package repository;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -114,6 +115,20 @@ WHERE base.Code = ? AND target.Code = ?
                 exchangeRate.setId(keys.getInt(1));
                 return exchangeRate;
             }
+		}
+	}
+	
+	public ExchangeRate update(ExchangeRate exchangeRate, BigDecimal rate) throws SQLException {
+		String sql = "UPDATE ExchangeRates SET rate = ? WHERE ID= ?";
+		
+		try(Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setBigDecimal(1, rate);
+			statement.setInt(2, exchangeRate.getId());
+			
+			statement.executeUpdate();
+			exchangeRate.setRate(rate);
+			return exchangeRate;
 		}
 	}
 	
