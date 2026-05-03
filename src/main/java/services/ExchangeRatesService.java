@@ -4,11 +4,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
+import exceptions.AlreadyExistsException;
 import exceptions.NotFoundException;
 import models.ExchangeRate;
 import repository.ExchangeRatesRepository;
 
-public class ExchangeRatesService {
+public class ExchangeRatesService extends Service<ExchangeRate>{
 	private final ExchangeRatesRepository exchangeRatesRepository;
 	
 	public ExchangeRatesService(ExchangeRatesRepository exchangeRatesRepository) {
@@ -27,4 +28,16 @@ public class ExchangeRatesService {
 	                    "Exchange rate not found for " + codeBase + codeTarget
 	            ));
 	}
+	
+	public ExchangeRate create(ExchangeRate exchangeRate) throws SQLException, AlreadyExistsException {
+        try {
+        	return exchangeRatesRepository.save(exchangeRate);
+        } catch (SQLException e) {
+            if (isUniqueConstraintViolation(e)) {
+                throw new AlreadyExistsException("Exchange rate already exists");
+            }
+            throw e;
+        }
+	}
+	
 }

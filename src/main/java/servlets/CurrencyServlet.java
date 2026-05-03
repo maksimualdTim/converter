@@ -59,7 +59,7 @@ public class CurrencyServlet extends HttpServlet {
             Currency currency = currencyService.findByCode(code);
             response.getWriter().write(CurrencyJsonMapper.toJson(currency));
         } catch (NotFoundException e) {
-        	JsonErrorResponse.prepareResponse(HttpServletResponse.SC_NOT_FOUND, "Currency not found", response);
+        	JsonErrorResponse.prepareResponse(HttpServletResponse.SC_NOT_FOUND, e.getMessage(), response);
 		} catch (SQLException e) {
             e.printStackTrace();
             JsonErrorResponse.prepareResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal server error", response);

@@ -17,7 +17,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import config.DataSourceProvider;
-import exceptions.CurrencyAlreadyExistsException;
+import exceptions.AlreadyExistsException;
 
 /**
  * Servlet implementation class CurrenciesServlet
@@ -63,21 +63,21 @@ public class CurrenciesServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 	    
-	    String name = trim(request.getParameter("name"));
-	    String code = trim(request.getParameter("code"));
-	    String sign = trim(request.getParameter("sign"));
+	    String name = Utils.trim(request.getParameter("name"));
+	    String code = Utils.trim(request.getParameter("code"));
+	    String sign = Utils.trim(request.getParameter("sign"));
 		
-	    if (isBlank(name)) {
+	    if (Utils.isBlank(name)) {
 	        JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "The name field is required", response);
 	        return;
 	    }
 
-	    if (isBlank(code)) {
+	    if (Utils.isBlank(code)) {
 	        JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "The code field is required", response);
 	        return;
 	    }
 
-	    if (isBlank(sign)) {
+	    if (Utils.isBlank(sign)) {
 	        JsonErrorResponse.prepareResponse(HttpServletResponse.SC_BAD_REQUEST, "The sign field is required", response);
 	        return;
 	    }
@@ -91,9 +91,8 @@ public class CurrenciesServlet extends HttpServlet {
 		
 		try {
 			createdCurrency = currencyService.create(currency);
-		} catch (CurrencyAlreadyExistsException e) {
-			response.setStatus(HttpServletResponse.SC_CONFLICT);
-			response.getWriter().write("{\"message\":\"" + e.getMessage() + "\"}");
+		} catch (AlreadyExistsException e) {
+			JsonErrorResponse.prepareResponse(HttpServletResponse.SC_CONFLICT, e.getMessage(), response);
 			return;
 		}
 		catch (SQLException e) {
@@ -104,14 +103,6 @@ public class CurrenciesServlet extends HttpServlet {
 		
 		response.setStatus(HttpServletResponse.SC_CREATED);
 		response.getWriter().write(CurrencyJsonMapper.toJson(createdCurrency));
-	}
-	
-	private String trim(String value) {
-	    return value == null ? null : value.trim();
-	}
-
-	private boolean isBlank(String value) {
-	    return value == null || value.isBlank();
 	}
 
 }

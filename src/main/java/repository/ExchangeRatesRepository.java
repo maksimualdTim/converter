@@ -88,6 +88,35 @@ WHERE base.Code = ? AND target.Code = ?
 		return Optional.empty();
 	}
 	
+	public ExchangeRate save(ExchangeRate exchangeRate) throws SQLException {
+		String sql = """
+				INSERT INTO ExchangeRates (BaseCurrencyId, TargetCurrencyId, Rate)
+				VALUES (?, ?, ?)
+				""";
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+				){
+			statement.setInt(1, exchangeRate.getBaseCurrency().getId());
+			statement.setInt(2, exchangeRate.getTargetCurrency().getId());
+			statement.setBigDecimal(3, exchangeRate.getRate());
+			
+			int rowsAffected = statement.executeUpdate();
+			
+            if (rowsAffected != 1) {
+                throw new SQLException("Expected 1 inserted row, but got: " + rowsAffected);
+            }
+            
+            try (ResultSet keys = statement.getGeneratedKeys()) {
+                if (!keys.next()) {
+                    throw new SQLException("ExchangeRate was inserted, but generated ID was not returned.");
+                }
+
+                exchangeRate.setId(keys.getInt(1));
+                return exchangeRate;
+            }
+		}
+	}
+	
 	private ExchangeRate mapExchangeRate(ResultSet res) throws SQLException {
 		ExchangeRate exchangeRate = new ExchangeRate();
 		
