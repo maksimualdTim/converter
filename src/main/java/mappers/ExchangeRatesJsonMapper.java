@@ -1,6 +1,7 @@
 package mappers;
 
 
+import java.math.RoundingMode;
 import java.util.List;
 
 import models.Currency;
@@ -23,7 +24,7 @@ public class ExchangeRatesJsonMapper {
 		result.append("\"targetCurrency\":");
 		result.append(targetCurrencyJson);
 		result.append(',');
-		result.append("\"rate\":" + exchangeRate.getRate());
+		result.append("\"rate\":" + exchangeRate.getRate().setScale(2, RoundingMode.HALF_UP));
 		result.append('}');
 		
 		return result.toString();
